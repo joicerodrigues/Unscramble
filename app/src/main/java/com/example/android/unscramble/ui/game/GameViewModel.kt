@@ -1,124 +1,96 @@
-/*
- * Copyright (C) 2020 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.android.unscramble.ui.game
 
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.TtsSpan
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 
-/**
- * ViewModel containing the app data and methods to process the data
- */
 class GameViewModel : ViewModel() {
-    private val _score = MutableLiveData(0)
-    val score: LiveData<Int>
+
+    // private val viewModel = GameViewModel() // modelo de visualização usando o construtor padrão
+    //movendo variáveis
+    private var _score = 0
+    val score: Int
         get() = _score
 
-    private val _currentWordCount = MutableLiveData(0)
-    val currentWordCount: LiveData<Int>
+    private var _currentWordCount = 0
+    val currentWordCount: Int
         get() = _currentWordCount
 
-    private val _currentScrambledWord = MutableLiveData<String>()
-    val currentScrambledWord: LiveData<Spannable> = Transformations.map(_currentScrambledWord) {
-        if (it == null) {
-            SpannableString("")
-        } else {
-            val scrambledWord = it.toString()
-            val spannable: Spannable = SpannableString(scrambledWord)
-            spannable.setSpan(
-                    TtsSpan.VerbatimBuilder(scrambledWord).build(),
-                    0,
-                    scrambledWord.length,
-                    Spannable.SPAN_INCLUSIVE_INCLUSIVE
-            )
-            spannable
-        }
-    }
+    private lateinit var _currentScrambledWord: String
+    //propriedade de apoio
+    val currentScrambledWord: String
+        get() = _currentScrambledWord
 
-    // List of words used in the game
-    private var wordsList: MutableList<String> = mutableListOf()
-    private lateinit var currentWord: String
+    private var wordsList: MutableList<String> = mutableListOf() //armazenar lista de palavras
+    private lateinit var currentWord: String // armazena palavra que o jogador está tentando decifrar
 
     init {
+        Log.d("GameFragment", "GameViewModel created!")
         getNextWord()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("GameFragment", "GameViewModel destroyed!")
+    }
+
+
     /*
-     * Updates currentWord and currentScrambledWord with the next word.
-     */
+    * Atualiza currentWord e currentScrambledWord com a próxima palavra.
+    */
     private fun getNextWord() {
-        currentWord = allWordsList.random()
-        val tempWord = currentWord.toCharArray()
-        tempWord.shuffle()
+        currentWord = allWordsList.random() //acessando palavra aleatória
+        val tempWord = currentWord.toCharArray() // convertendo string para matriz
+        tempWord.shuffle() // atribuindo matriz para variável tempWord e embaralha os caracteres
 
         while (String(tempWord).equals(currentWord, false)) {
+            //embaralhar a palavra para continuar a repetição até que a palavra embaralhada não seja igual à palavra original.
             tempWord.shuffle()
         }
-        if (wordsList.contains(currentWord)) {
+
+        if (wordsList.contains(currentWord)) { //verificar se a palavra foi usada ou não
             getNextWord()
         } else {
-            Log.d("Unscramble", "currentWord= $currentWord")
-            _currentScrambledWord.value = String(tempWord)
-            _currentWordCount.value = _currentWordCount.value?.inc()
-            wordsList.add(currentWord)
+            _currentScrambledWord = String(tempWord) // atualiza o valor da variável com a palavra recém embaralhada
+            ++_currentWordCount // aumenta contagem de de palabras
+            wordsList.add(currentWord) // adiciona nova palavra em wordlist
         }
+
     }
 
-    /*
-     * Re-initializes the game data to restart the game.
-     */
-    fun reinitializeData() {
-        _score.value = 0
-        _currentWordCount.value = 0
-        wordsList.clear()
-        getNextWord()
-    }
 
     /*
-    * Increases the game score if the player’s word is correct.
+    * Retorna verdadeiro se a contagem de palavras atual for menor que MAX_NO_OF_WORDS.
+    * Atualiza a próxima palavra.
     */
+
     private fun increaseScore() {
-        _score.value = _score.value?.plus(SCORE_INCREASE)
+        _score += SCORE_INCREASE //Aumenta a variável score usando SCORE_INCREASE
     }
 
-    /*
-    * Returns true if the player word is correct.
-    * Increases the score accordingly.
-    */
     fun isUserWordCorrect(playerWord: String): Boolean {
-        if (playerWord.equals(currentWord, true)) {
+        if (playerWord.equals(currentWord,true)) {
+            //valida a palavra do jogador e aumente a pontuação se o palpite estiver correto
             increaseScore()
             return true
         }
         return false
     }
 
-    /*
-    * Returns true if the current word count is less than MAX_NO_OF_WORDS
-    */
     fun nextWord(): Boolean {
-        return if (_currentWordCount.value!! < MAX_NO_OF_WORDS) {
+        return if (_currentWordCount < MAX_NO_OF_WORDS) {
             getNextWord()
             true
         } else false
     }
+
+    /*
+    * Reinicializa os dados do jogo para reiniciar o jogo.
+    */
+    fun reinitializeData() {
+        _score = 0
+        _currentWordCount = 0
+        wordsList.clear()
+        getNextWord()
+    }
+
 }
