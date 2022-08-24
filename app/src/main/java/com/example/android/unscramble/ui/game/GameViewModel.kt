@@ -1,11 +1,14 @@
 package com.example.android.unscramble.ui.game
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.android.unscramble.R
 
 class GameViewModel : ViewModel() {
 
-    // private val viewModel = GameViewModel() // modelo de visualização usando o construtor padrão
+    //private val viewModel = GameViewModel() // modelo de visualização usando o construtor padrão
     //movendo variáveis
     private var _score = 0
     val score: Int
@@ -15,7 +18,7 @@ class GameViewModel : ViewModel() {
     val currentWordCount: Int
         get() = _currentWordCount
 
-    private lateinit var _currentScrambledWord: String
+    private lateinit var _currentScrambledWord: String //somente os dados armazenados no objeto mudarão
     //propriedade de apoio
     val currentScrambledWord: String
         get() = _currentScrambledWord
@@ -51,7 +54,7 @@ class GameViewModel : ViewModel() {
             getNextWord()
         } else {
             _currentScrambledWord = String(tempWord) // atualiza o valor da variável com a palavra recém embaralhada
-            ++_currentWordCount // aumenta contagem de de palabras
+            ++_currentWordCount // aumenta contagem de de palavras
             wordsList.add(currentWord) // adiciona nova palavra em wordlist
         }
 
@@ -92,5 +95,12 @@ class GameViewModel : ViewModel() {
         wordsList.clear()
         getNextWord()
     }
+
+//    fun showScore(){
+//        val Word = Null
+//        if (Word.equals(currentWord)) {
+//            _score += SCORE_INCREASE
+//        }
+//    }
 
 }
