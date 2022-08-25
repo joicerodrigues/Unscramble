@@ -168,10 +168,10 @@ class GameFragment : Fragment() {
 
     private fun updateScoreAndWords(){
         //getString(R.string.score, viewModel.score)
-
     //    var scoreFinal = viewModel.showScore()
-        binding.score.text = viewModel.score.toString()
-        binding.wordCount.text = viewModel.currentWordCount.toString()
+        binding.score.text = "Score: " + viewModel.score.toString()
+        //binding.score.text = viewModel.score.toString()
+        binding.wordCount.text =  viewModel.currentWordCount.toString() + " of 10 words"
         //binding.score.text = scoreFinal.toString()
     }
 }

@@ -13,6 +13,7 @@ class GameViewModel : ViewModel() {
 
     //private val viewModel = GameViewModel() // modelo de visualização usando o construtor padrão
     //movendo variáveis
+
     private var _score = 0
     val score: Int
         get() = _score
