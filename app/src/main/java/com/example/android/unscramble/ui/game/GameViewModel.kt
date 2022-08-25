@@ -1,10 +1,13 @@
 package com.example.android.unscramble.ui.game
 
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.android.unscramble.R
+import com.example.android.unscramble.databinding.GameFragmentBinding
 
 class GameViewModel : ViewModel() {
 
@@ -19,6 +22,7 @@ class GameViewModel : ViewModel() {
         get() = _currentWordCount
 
     private lateinit var _currentScrambledWord: String //somente os dados armazenados no objeto mudarão
+
     //propriedade de apoio
     val currentScrambledWord: String
         get() = _currentScrambledWord
@@ -53,7 +57,8 @@ class GameViewModel : ViewModel() {
         if (wordsList.contains(currentWord)) { //verificar se a palavra foi usada ou não
             getNextWord()
         } else {
-            _currentScrambledWord = String(tempWord) // atualiza o valor da variável com a palavra recém embaralhada
+            _currentScrambledWord =
+                String(tempWord) // atualiza o valor da variável com a palavra recém embaralhada
             ++_currentWordCount // aumenta contagem de de palavras
             wordsList.add(currentWord) // adiciona nova palavra em wordlist
         }
@@ -66,14 +71,15 @@ class GameViewModel : ViewModel() {
     * Atualiza a próxima palavra.
     */
 
-    private fun increaseScore() {
+     fun increaseScore() {
         _score += SCORE_INCREASE //Aumenta a variável score usando SCORE_INCREASE
     }
 
     fun isUserWordCorrect(playerWord: String): Boolean {
-        if (playerWord.equals(currentWord,true)) {
+        if (playerWord.equals(currentWord, true)) {
             //valida a palavra do jogador e aumente a pontuação se o palpite estiver correto
-            increaseScore()
+            _score += SCORE_INCREASE; // adiciona +1 na váriavel numero
+
             return true
         }
         return false
@@ -95,12 +101,15 @@ class GameViewModel : ViewModel() {
         wordsList.clear()
         getNextWord()
     }
-
-//    fun showScore(){
-//        val Word = Null
-//        if (Word.equals(currentWord)) {
-//            _score += SCORE_INCREASE
+//
+        //lateinit var binding: GameFragmentBinding
+//        var playerWord
+//        if (isUserWordCorrect(playerWord) == true) {
+//            _score +20
 //        }
-//    }
+//        else {
+//            _score
+//        }
+    }
 
-}
+

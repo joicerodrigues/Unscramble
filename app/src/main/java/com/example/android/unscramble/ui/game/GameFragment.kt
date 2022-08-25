@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.android.unscramble.R
@@ -62,7 +63,7 @@ class GameFragment : Fragment() {
         binding.skip.setOnClickListener { onSkipWord() }
         // Update the UI
         updateNextWordOnScreen()
-        binding.score.text = getString(R.string.score, 0)
+        //binding.score.text = getString(R.string.score, 0)
         binding.wordCount.text = getString(
             R.string.word_count, 0, MAX_NO_OF_WORDS
         )
@@ -162,7 +163,14 @@ class GameFragment : Fragment() {
          */
     private fun updateNextWordOnScreen() {
         binding.textViewUnscrambledWord.text = viewModel.currentScrambledWord
-
+        updateScore()
     }
 
+    private fun updateScore(){
+        //getString(R.string.score, viewModel.score)
+
+    //    var scoreFinal = viewModel.showScore()
+        binding.score.text = viewModel.score.toString()
+        //binding.score.text = scoreFinal.toString()
+    }
 }
