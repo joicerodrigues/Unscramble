@@ -163,14 +163,15 @@ class GameFragment : Fragment() {
          */
     private fun updateNextWordOnScreen() {
         binding.textViewUnscrambledWord.text = viewModel.currentScrambledWord
-        updateScore()
+        updateScoreAndWords()
     }
 
-    private fun updateScore(){
+    private fun updateScoreAndWords(){
         //getString(R.string.score, viewModel.score)
 
     //    var scoreFinal = viewModel.showScore()
         binding.score.text = viewModel.score.toString()
+        binding.wordCount.text = viewModel.currentWordCount.toString()
         //binding.score.text = scoreFinal.toString()
     }
 }
