@@ -1,39 +1,56 @@
 package com.example.android.unscramble.ui.game
 
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.TtsSpan
 import android.util.Log
-import android.view.View
-import android.widget.TextView
+
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import com.example.android.unscramble.R
-import com.example.android.unscramble.databinding.GameFragmentBinding
+
 
 class GameViewModel : ViewModel() {
 
     //private val viewModel = GameViewModel() // modelo de visualização usando o construtor padrão
     //movendo variáveis
 
-    private var _score = 0
-    val score: Int
-        get() = _score
+    private var _score = MutableLiveData(0) // variável mutável recebendo 0
+    val score: LiveData<Int> // variável que vai para o fragment recebendo liveData que recebe o valor via get
+        get() = _score // recebe valor
 
-    private var _currentWordCount = 0
-    val currentWordCount: Int
+    private var _currentWordCount = MutableLiveData(0)
+    val currentWordCount: LiveData<Int>
         get() = _currentWordCount
 
-    private lateinit var _currentScrambledWord: String //somente os dados armazenados no objeto mudarão
+    private val _currentScrambledWord = MutableLiveData<String>()
+    val currentScrambledWord: LiveData<Spannable> = Transformations.map(_currentScrambledWord) {
+        if (it == null) {
+            SpannableString("")
+        } else {
+            val scrambledWord = it.toString()
+            val spannable: Spannable = SpannableString(scrambledWord)
+            spannable.setSpan(
+                TtsSpan.VerbatimBuilder(scrambledWord).build(),
+                0,
+                scrambledWord.length,
+                Spannable.SPAN_INCLUSIVE_INCLUSIVE
+            )
+            spannable
+        }
+    }
 
-    //propriedade de apoio
-    val currentScrambledWord: String
-        get() = _currentScrambledWord
 
     private var wordsList: MutableList<String> = mutableListOf() //armazenar lista de palavras
     private lateinit var currentWord: String // armazena palavra que o jogador está tentando decifrar
 
+
     init {
-        Log.d("GameFragment", "GameViewModel created!")
+      //  Log.d("GameFragment", "GameViewModel created!")
         getNextWord()
+      //  _score.postValue(5)
+
     }
 
     override fun onCleared() {
@@ -58,9 +75,9 @@ class GameViewModel : ViewModel() {
         if (wordsList.contains(currentWord)) { //verificar se a palavra foi usada ou não
             getNextWord()
         } else {
-            _currentScrambledWord =
+            _currentScrambledWord.value =
                 String(tempWord) // atualiza o valor da variável com a palavra recém embaralhada
-            ++_currentWordCount // aumenta contagem de de palavras
+            _currentWordCount.value = (_currentWordCount.value)?.inc() // aumenta contagem de palavras com seguraça de tipo nulo; adicionando value para acessar um objeto liveData
             wordsList.add(currentWord) // adiciona nova palavra em wordlist
         }
 
@@ -73,32 +90,36 @@ class GameViewModel : ViewModel() {
     */
 
      fun increaseScore() {
-        _score += SCORE_INCREASE //Aumenta a variável score usando SCORE_INCREASE
+        _score.value = (_score.value)?.plus(SCORE_INCREASE) //Aumenta a variável score usando SCORE_INCREASE; adicionando value para acessar um objeto liveData
     }
 
     fun isUserWordCorrect(playerWord: String): Boolean {
         if (playerWord.equals(currentWord, true)) {
             //valida a palavra do jogador e aumente a pontuação se o palpite estiver correto
-            _score += SCORE_INCREASE; // adiciona +1 na váriavel numero
-
+            //_score += SCORE_INCREASE; // adiciona +20 na váriavel
+            increaseScore()
             return true
         }
         return false
     }
 
+
     fun nextWord(): Boolean {
-        return if (_currentWordCount < MAX_NO_OF_WORDS) {
-            getNextWord()
-            true
-        } else false
+        _currentWordCount.value?.let {
+            return if (it < MAX_NO_OF_WORDS) {// adicionando value para acessar um objeto liveData
+                getNextWord()
+                true
+            } else false
+        }
+        return false
     }
 
     /*
     * Reinicializa os dados do jogo para reiniciar o jogo.
     */
     fun reinitializeData() {
-        _score = 0
-        _currentWordCount = 0
+        _score.value = 0
+        _currentWordCount.value = 0 // adicionando value para acessar um objeto liveData
         wordsList.clear()
         getNextWord()
     }
